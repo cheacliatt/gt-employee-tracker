@@ -27,10 +27,9 @@ It should also be noted that user's MUST add all data from employeeSeeds.sql to 
 The primary usage of this code is to create and view employees within a company.
 
 ## Links
-[GitHub repository](https://github.com/cheacliatt/gt-weather-dashboard "Repository")
+[GitHub repository](https://github.com/cheacliatt/gt-employee-tracker "Repository")
 
-
-[Heroku Server](https://gt-note-taker.herokuapp.com/ "Heroku")
+[Video Walkthrough](https://drive.google.com/file/d/166ca_0bjH4tHpEGkrb_EkgIUOZiyjl8T/view "Video")
 
 
 ## License
