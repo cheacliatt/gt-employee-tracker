@@ -199,18 +199,18 @@ function removeEmployee() {
             },
           ])
           .then((response) => {
-            let employeeEl;
+            let employeeEl = {};
             for (let i = 0; i < data.length; i++) {
               if (data[i].id === response.name) {
-                employeeEl = data[i].id;
+                employeeEl  = data[i].id;
               }
             }
             connection.query(
-              "UPDATE employee SET ? WHERE id =?",
+              `UPDATE employee SET ? WHERE id = ${employeeEl}`,
               {
                 first_name: response.firstName,
                 last_name: response.lastName,
-                id: employeeEl,
+                // id: employeeEl + 1,
               },
               function (err) {
                 if (err) throw err;
