@@ -26,7 +26,7 @@ connection.connect(function (err) {
 
 function init() {
   inquirer
-  // Inquirer list of questions, basic stuff
+    // Inquirer list of questions, basic stuff
     .prompt([
       {
         type: "list",
@@ -35,6 +35,8 @@ function init() {
           "View All Employees By Department",
           "View All Employees By Manager",
           "Add Employee",
+          "Add Role",
+          "Add Department",
           "Remove Employee",
           "Update Employee",
           "Update Employee Role",
@@ -51,6 +53,10 @@ function init() {
         addNewEmployee();
       } else if (choice === "Remove Employee") {
         removeEmployee();
+      } else if (choice === "Add Role") {
+        addNewRole();
+      } else if (choice === "Add Department") {
+        addNewDepartment();
       } else if (choice === "Update Employee") {
         updateEmployee();
       } else if (choice === "Update Employee Role") {
@@ -79,7 +85,7 @@ function viewAllEmployees() {
     function (err, res) {
       if (err) throw err;
       console.table(res);
-      // The init function will run at the end of any function called, to return to the main menu for user 
+      // The init function will run at the end of any function called, to return to the main menu for user
       init();
     }
   );
@@ -135,7 +141,7 @@ function addNewEmployee() {
           }
         }
         const { firstName, lastName } = response;
-        // Constructor that takes the input from user so that it  can be inserted into the employee table 
+        // Constructor that takes the input from user so that it  can be inserted into the employee table
         connection.query(
           "INSERT INTO employee SET ?",
           {
@@ -151,6 +157,87 @@ function addNewEmployee() {
         );
       });
   });
+}
+// Add New Role is essentially the same as Add New Employee, but you're matching depart_id for role with the department id
+function addNewRole() {
+  // In order to supply the user with a list of roles to choose from, this prompt is contained in a query that selects from roles
+  connection.query("SELECT * FROM department", (err, data) => {
+    if (err) throw err;
+    // This it takes the title key from roles, gets the data based off that key for each role, and places that data into a variable that is an array
+    const arrayOfDepartments = data.map((object) => object.name);
+    inquirer
+      .prompt([
+        {
+          name: "roleTitle",
+          type: "input",
+          message: "What is the role you would like to create?",
+        },
+        {
+          name: "salaryEl",
+          type: "input",
+          message: "What is the salary for the role?",
+        },
+        {
+          name: "roleDepartment",
+          type: "list",
+          message: "Please select the department for the role:",
+          choices: arrayOfDepartments,
+          // The titles for roles is displayed here as choices
+        },
+      ])
+      .then((response) => {
+        console.log(response);
+        let choiceId = {};
+        // This is running the data from the role table through a for loop, then it looks for a match between the id of employee role to which role the user chose
+        // It then makes choiceId equal that ID number for the correlating role so that the employee role_id matches the role's id
+        for (let i = 0; i < data.length; i++) {
+          if (data[i].name === response.roleDepartment) {
+            choiceId = data[i];
+          }
+        }
+        const { roleTitle, salaryEl } = response;
+        // Constructor that takes the input from user so that it  can be inserted into the employee table
+        connection.query(
+          "INSERT INTO role SET ?",
+          {
+            title: roleTitle,
+            salary: salaryEl,
+            department_id: choiceId.id,
+            // The ID we received from the for loop is placed here, so that way employee and role match ID's
+          },
+          function (err) {
+            if (err) throw err;
+            init();
+          }
+        );
+      });
+  });
+}
+
+// This is the easiest one. It's just creating the department with an auto increment id
+function addNewDepartment() {
+  inquirer
+    .prompt([
+      {
+        name: "departmentName",
+        type: "input",
+        message: "What is the department you would like to create?",
+      },
+    ])
+    .then((response) => {
+      const { departmentName } = response;
+      // Constructor that takes the input from user so that it  can be inserted into the employee table
+      connection.query(
+        "INSERT INTO department SET ?",
+        {
+          name: departmentName,
+        },
+        function (err) {
+          if (err) throw err;
+          init();
+        }
+      );
+    });
 }
 
 function removeEmployee() {
