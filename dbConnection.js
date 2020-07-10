@@ -82,10 +82,6 @@ function viewByDepartment() {
   );
 }
 
-
-
-
-
 function addNewEmployee() {
   connection.query("SELECT * FROM role", (err, data) => {
     if (err) throw err;
@@ -129,68 +125,99 @@ function addNewEmployee() {
             if (err) throw err;
             init();
           }
-        )
+        );
       });
   });
 }
 
+// function removeEmployee() {
+//   inquirer
+//     .prompt([
+//       {
+//         name: "lastName",
+//         type: "input",
+//         message: "What is the last name of the employee you wish to remove?",
+//       },
+//     ])
+//     .then((answer) => {
+//       // when finished prompting, insert a new item into the db with that info
+//       connection.query(
+//         "DELETE FROM employee WHERE ?",
+//         {
+//           last_name: answer.lastName,
+//         },
+//         (err) => {
+//           if (err) throw err;
+//           console.log("Your employee was removed successfully!");
+//           // re-prompt the user for if they want to bid or post
+//           removeRole();
+//         }
+//       );
+//     });
+// }
 
 function removeEmployee() {
-  inquirer
-    .prompt([
-      // {
-      //   name: "firstName",
-      //   type: "input",
-      //   message: "What is the first name of the employee you wish to remove?",
-      // },
-      {
-        name: "lastName",
-        type: "input",
-        message: "What is the last name of the employee you wish to remove?",
-      },
-    ])
-    .then((answer) => {
-      // when finished prompting, insert a new item into the db with that info
-      connection.query(
-        "DELETE FROM employee WHERE ?",
-        {
-          last_name: answer.lastName,
-        },
-        (err) => {
-          if (err) throw err;
-          console.log("Your employee was removed successfully!");
-          // re-prompt the user for if they want to bid or post
-          removeRole();
-        }
+  connection.query("SELECT * FROM employee"),
+    function (err, data) {
+      if (err) throw err;
+      const arrayOfEmployees = data.map(
+        (object) => object.first_name,
+        object.last_name
       );
-    });
+      const arrayOfIds = data.map((objectTwo) => objectTwo.id);
+      inquirer
+        .prompt([
+          {
+            type: "list",
+            message: "Which employee would you like to remove?",
+            choices: arrayOfEmployees,
+            name: arrayOfIds,
+          },
+        ])
+        .then((response) => {
+          let employeeEl = {};
+          for (let i = 0; i < data.length; i++) {
+            if (data[i].id === response.name) {
+              employeeEl = data[i].id;
+            }
+          }
+          connection.query(
+            "DELETE FROM employee WHERE id =?",
+            [employeeEl],
+            function (err) {
+              if (err) throw err;
+              init();
+            }
+          );
+        });
+    };
 }
 
-function removeRole() {
-  inquirer
-    .prompt([
-      {
-        name: "position",
-        type: "input",
-        message: "What was their role?",
-      },
-    ])
-    .then((answer) => {
-      // when finished prompting, insert a new item into the db with that info
-      connection.query(
-        "DELETE FROM role WHERE ?",
-        {
-          title: answer.position,
-        },
-        (err) => {
-          if (err) throw err;
-          console.log("Your role was removed successfully!");
-          // re-prompt the user for if they want to bid or post
-          init();
-        }
-      );
-    });
-}
+// function removeRole() {
+//   inquirer
+//     .prompt([
+//       {
+//         name: "position",
+//         type: "input",
+//         message: "What was their role?",
+//       },
+//     ])
+//     .then((answer) => {
+//       // when finished prompting, insert a new item into the db with that info
+//       connection.query(
+//         "DELETE FROM role WHERE ?",
+//         {
+//           title: answer.position,
+//         },
+//         (err) => {
+//           if (err) throw err;
+//           console.log("Your role was removed successfully!");
+//           // re-prompt the user for if they want to bid or post
+//           init();
+//         }
+//       );
+//     });
+// }
 
 function exit() {
   connection.end();
