@@ -48,6 +48,14 @@ SELECT employee.id, employee.first_name, role.title, department.name
 FROM employee
 LEFT JOIN role ON employee.role_id = role.id
 LEFT JOIN department ON role.department_id = department.id;
+
+
+SELECT department.name, role.title, employee.first_name, employee.last_name
+FROM department
+LEFT JOIN role ON role.department_id = department.id
+LEFT JOIN employee ON employee.role_id = role.id;
+
+
 -- INSERT INTO department (name)
 -- VALUES ("Software Development");
 

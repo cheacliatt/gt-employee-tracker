@@ -50,6 +50,8 @@ function init() {
         updateEmployee();
       } else if (choice == "View All Employees") {
         viewAllEmployees();
+      } else if (choice == "View All Employees By Department") {
+        viewByDepartment();
       } else {
         exit();
       }
@@ -68,37 +70,18 @@ function viewAllEmployees() {
   );
 }
 
-// function addEmployee() {
-//   inquirer
-//     .prompt([
-//       {
-//         name: "firstName",
-//         type: "input",
-//         message: "What is the employee's first name?",
-//       },
-//       {
-//         name: "lastName",
-//         type: "input",
-//         message: "What is the employee's last name?",
-//       },
-//     ])
-//     .then((answer) => {
-//       // when finished prompting, insert a new item into the db with that info
-//       connection.query(
-//         "INSERT INTO employee SET ?",
-//         {
-//           first_name: answer.firstName,
-//           last_name: answer.lastName,
-//         },
-//         (err) => {
-//           if (err) throw err;
-//           console.log("Your employee was added successfully!");
-//           // re-prompt the user for if they want to bid or post
-//           assignRole();
-//         }
-//       );
-//     });
-// }
+function viewByDepartment() {
+  console.log("Selecting all employees...\n");
+  connection.query(
+    "SELECT department.name, role.title, employee.first_name, employee.last_name FROM department LEFT JOIN role ON role.department_id = department.id LEFT JOIN employee ON employee.role_id = role.id;",
+    function (err, res) {
+      if (err) throw err;
+      console.table(res);
+      init();
+    }
+  );
+}
+
 
 
 
@@ -151,81 +134,6 @@ function addNewEmployee() {
   });
 }
 
-// .then((data) => {
-//           let selectedId = {};
-//           for (let i = 0; i < res.length; i++) {
-//             if (res[i].title === data.role_id) {
-//               selectedId = res[i];
-//             }
-//           }
-//           const { first_name, last_name, manager_id } = data;
-//           connection.query(
-//             "INSERT INTO employee SET ?",
-//             {
-//               first_name: first_name,
-//               last_name: last_name,
-//               role_id: selectedId.id,
-//               manager_id: manager_id,
-//             },
-//             function (err, res) {
-//               if (err) throw err;
-//               console.log(res.affectedRows + " new employee added\n");
-//               init();
-//             }
-//           );
-//         });
-
-// connection.query(
-//   "INSERT INTO employee SET ?",
-//   {
-//     first_name: answer.firstName,
-//     last_name: answer.lastName,
-//   },
-//   (err) => {
-//     if (err) throw err;
-//     console.log("Your employee was added successfully!");
-//     // re-prompt the user for if they want to bid or post
-//     assignRole();
-//   }
-// );
-
-
-
-
-
-
-
-// function assignRole() {
-//   inquirer
-//     .prompt([
-//       {
-//         name: "position",
-//         type: "input",
-//         message: "What is their role?",
-//       },
-//       {
-//         name: "salary",
-//         type: "input",
-//         message: "What is their salary?",
-//       },
-//     ])
-//     .then((answer) => {
-//       // when finished prompting, insert a new item into the db with that info
-//       connection.query(
-//         "INSERT INTO role SET ?",
-//         {
-//           title: answer.position,
-//           salary: answer.salary,
-//         },
-//         (err) => {
-//           if (err) throw err;
-//           console.log("Your role was added successfully!");
-//           // re-prompt the user for if they want to bid or post
-//           init();
-//         }
-//       );
-//     });
-// }
 
 function removeEmployee() {
   inquirer
