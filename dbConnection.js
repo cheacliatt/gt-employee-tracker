@@ -50,16 +50,21 @@ function init() {
         updateEmployee();
       } else if (choice === "Update Employee Role") {
         updateEmployeeRole();
+      } else if (choice === "Update Employee Manager") {
+        console.log("\n In Development. Sorry! \n");
+        init();
       } else if (choice == "View All Employees") {
         viewAllEmployees();
       } else if (choice == "View All Employees By Department") {
         viewByDepartment();
+      } else if (choice == "View All Employees By Manager") {
+        console.log("\n In Development. Sorry! \n");
+        init();
       } else {
         exit();
       }
     });
 }
-
 
 function viewAllEmployees() {
   console.log("Selecting all employees...\n");
@@ -258,7 +263,7 @@ function updateEmployeeRole() {
             }
           }
           let roleEl = {};
-          for (let i = 0; i < dataTwo.length; i++){
+          for (let i = 0; i < dataTwo.length; i++) {
             if (dataTwo[i].id === response.roleTitle) {
               roleEl = dataTwo[i].id;
             }
