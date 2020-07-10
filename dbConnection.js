@@ -99,10 +99,10 @@ function addNewEmployee() {
           message: "What is the employee's last name?",
         },
         {
+          name: "employeeRole",
           type: "list",
           message: "Please select the employee's role:",
           choices: arrayOfRoles,
-          name: "employeeRole",
         },
       ])
       .then((response) => {
@@ -166,6 +166,63 @@ function removeEmployee() {
         });
     });
   }
+
+
+  // UPDATE EMPLOYEE
+  // I want to change the name of an employee
+
+  function updateEmployee() {
+    connection.query("SELECT * FROM employee",
+      function (err, data) {
+        if (err) throw err;
+        const arrayOfEmployees = data.map(({ id, first_name, last_name }) => ({
+          name: `${first_name} ${last_name} `,
+          value: id,
+        }));
+        inquirer
+          .prompt([
+            {
+              type: "list",
+              message: "Which employee would you like to update?",
+              choices: arrayOfEmployees,
+              name: "name",
+            },
+            {
+              type: "input",
+              message: "What is this employee's updated first name?",
+              name: "firstName",
+            },
+            {
+              type: "input",
+              message: "What is this employee's updated last name?",
+              name: "lastName",
+            },
+          ])
+          .then((response) => {
+            let employeeEl;
+            for (let i = 0; i < data.length; i++) {
+              if (data[i].id === response.name) {
+                employeeEl = data[i].id;
+              }
+            }
+            connection.query(
+              "UPDATE employee SET ? WHERE id =?",
+              {
+                first_name: response.firstName,
+                last_name: response.lastName,
+                id: employeeEl,
+              },
+              function (err) {
+                if (err) throw err;
+                console.log("Employee successfully updated.")
+                init();
+              }
+            );
+          });
+      });
+    }
+
+  
 
 function exit() {
   connection.end();
