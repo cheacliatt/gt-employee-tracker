@@ -130,48 +130,21 @@ function addNewEmployee() {
   });
 }
 
-// function removeEmployee() {
-//   inquirer
-//     .prompt([
-//       {
-//         name: "lastName",
-//         type: "input",
-//         message: "What is the last name of the employee you wish to remove?",
-//       },
-//     ])
-//     .then((answer) => {
-//       // when finished prompting, insert a new item into the db with that info
-//       connection.query(
-//         "DELETE FROM employee WHERE ?",
-//         {
-//           last_name: answer.lastName,
-//         },
-//         (err) => {
-//           if (err) throw err;
-//           console.log("Your employee was removed successfully!");
-//           // re-prompt the user for if they want to bid or post
-//           removeRole();
-//         }
-//       );
-//     });
-// }
-
 function removeEmployee() {
-  connection.query("SELECT * FROM employee"),
+  connection.query("SELECT * FROM employee",
     function (err, data) {
       if (err) throw err;
-      const arrayOfEmployees = data.map(
-        (object) => object.first_name,
-        object.last_name
-      );
-      const arrayOfIds = data.map((objectTwo) => objectTwo.id);
+      const arrayOfEmployees = data.map(({ id, first_name, last_name }) => ({
+        name: `${first_name} ${last_name} `,
+        value: id,
+      }));
       inquirer
         .prompt([
           {
             type: "list",
             message: "Which employee would you like to remove?",
             choices: arrayOfEmployees,
-            name: arrayOfIds,
+            name: "name",
           },
         ])
         .then((response) => {
@@ -186,38 +159,13 @@ function removeEmployee() {
             [employeeEl],
             function (err) {
               if (err) throw err;
+              console.log("Employee successfully removed.")
               init();
             }
           );
         });
-    };
-}
-
-// function removeRole() {
-//   inquirer
-//     .prompt([
-//       {
-//         name: "position",
-//         type: "input",
-//         message: "What was their role?",
-//       },
-//     ])
-//     .then((answer) => {
-//       // when finished prompting, insert a new item into the db with that info
-//       connection.query(
-//         "DELETE FROM role WHERE ?",
-//         {
-//           title: answer.position,
-//         },
-//         (err) => {
-//           if (err) throw err;
-//           console.log("Your role was removed successfully!");
-//           // re-prompt the user for if they want to bid or post
-//           init();
-//         }
-//       );
-//     });
-// }
+    });
+  }
 
 function exit() {
   connection.end();
