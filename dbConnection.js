@@ -48,6 +48,8 @@ function init() {
         removeEmployee();
       } else if (choice === "Update Employee") {
         updateEmployee();
+      } else if (choice === "Update Employee Role") {
+        updateEmployeeRole();
       } else if (choice == "View All Employees") {
         viewAllEmployees();
       } else if (choice == "View All Employees By Department") {
@@ -57,6 +59,7 @@ function init() {
       }
     });
 }
+
 
 function viewAllEmployees() {
   console.log("Selecting all employees...\n");
@@ -131,20 +134,120 @@ function addNewEmployee() {
 }
 
 function removeEmployee() {
-  connection.query("SELECT * FROM employee",
-    function (err, data) {
+  connection.query("SELECT * FROM employee", function (err, data) {
+    if (err) throw err;
+    const arrayOfEmployees = data.map(({ id, first_name, last_name }) => ({
+      name: `${first_name} ${last_name} `,
+      value: id,
+    }));
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          message: "Which employee would you like to remove?",
+          choices: arrayOfEmployees,
+          name: "name",
+        },
+      ])
+      .then((response) => {
+        let employeeEl = {};
+        for (let i = 0; i < data.length; i++) {
+          if (data[i].id === response.name) {
+            employeeEl = data[i].id;
+          }
+        }
+        connection.query(
+          "DELETE FROM employee WHERE id =?",
+          [employeeEl],
+          function (err) {
+            if (err) throw err;
+            console.log("Employee successfully removed.");
+            init();
+          }
+        );
+      });
+  });
+}
+
+// UPDATE EMPLOYEE
+// I want to change the name of an employee
+
+function updateEmployee() {
+  connection.query("SELECT * FROM employee", function (err, data) {
+    if (err) throw err;
+    const arrayOfEmployees = data.map(({ id, first_name, last_name }) => ({
+      name: `${first_name} ${last_name} `,
+      value: id,
+    }));
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          message: "Which employee would you like to update?",
+          choices: arrayOfEmployees,
+          name: "name",
+        },
+        {
+          type: "input",
+          message: "What is this employee's updated first name?",
+          name: "firstName",
+        },
+        {
+          type: "input",
+          message: "What is this employee's updated last name?",
+          name: "lastName",
+        },
+      ])
+      .then((response) => {
+        let employeeEl = {};
+        for (let i = 0; i < data.length; i++) {
+          if (data[i].id === response.name) {
+            employeeEl = data[i].id;
+          }
+        }
+        connection.query(
+          `UPDATE employee SET ? WHERE id = ${employeeEl}`,
+          {
+            first_name: response.firstName,
+            last_name: response.lastName,
+            // id: employeeEl + 1,
+          },
+          function (err) {
+            if (err) throw err;
+            console.log("Employee successfully updated.");
+            init();
+          }
+        );
+      });
+  });
+}
+
+function updateEmployeeRole() {
+  connection.query("SELECT * FROM employee", function (err, data) {
+    if (err) throw err;
+    const arrayOfEmployees = data.map(({ id, first_name, last_name }) => ({
+      name: `${first_name} ${last_name} `,
+      value: id,
+    }));
+    connection.query("SELECT * FROM role", function (err, dataTwo) {
       if (err) throw err;
-      const arrayOfEmployees = data.map(({ id, first_name, last_name }) => ({
-        name: `${first_name} ${last_name} `,
+      const arrayOfRoles = dataTwo.map(({ id, title }) => ({
+        name: `${title}`,
         value: id,
       }));
       inquirer
         .prompt([
           {
             type: "list",
-            message: "Which employee would you like to remove?",
+            message: "Which employee would you like to update?",
             choices: arrayOfEmployees,
             name: "name",
+          },
+          {
+            type: "list",
+            message: "What new role would you like to the employee?",
+            choices: arrayOfRoles,
+            name: "roleTitle",
           },
         ])
         .then((response) => {
@@ -154,75 +257,28 @@ function removeEmployee() {
               employeeEl = data[i].id;
             }
           }
+          let roleEl = {};
+          for (let i = 0; i < dataTwo.length; i++){
+            if (dataTwo[i].id === response.roleTitle) {
+              roleEl = dataTwo[i].id;
+            }
+          }
           connection.query(
-            "DELETE FROM employee WHERE id =?",
-            [employeeEl],
+            `UPDATE employee SET ? WHERE id = ${employeeEl}`,
+            {
+              role_id: roleEl,
+              // id: employeeEl + 1,
+            },
             function (err) {
               if (err) throw err;
-              console.log("Employee successfully removed.")
+              console.log("Employee role successfully updated.");
               init();
             }
           );
         });
     });
-  }
-
-
-  // UPDATE EMPLOYEE
-  // I want to change the name of an employee
-
-  function updateEmployee() {
-    connection.query("SELECT * FROM employee",
-      function (err, data) {
-        if (err) throw err;
-        const arrayOfEmployees = data.map(({ id, first_name, last_name }) => ({
-          name: `${first_name} ${last_name} `,
-          value: id,
-        }));
-        inquirer
-          .prompt([
-            {
-              type: "list",
-              message: "Which employee would you like to update?",
-              choices: arrayOfEmployees,
-              name: "name",
-            },
-            {
-              type: "input",
-              message: "What is this employee's updated first name?",
-              name: "firstName",
-            },
-            {
-              type: "input",
-              message: "What is this employee's updated last name?",
-              name: "lastName",
-            },
-          ])
-          .then((response) => {
-            let employeeEl = {};
-            for (let i = 0; i < data.length; i++) {
-              if (data[i].id === response.name) {
-                employeeEl  = data[i].id;
-              }
-            }
-            connection.query(
-              `UPDATE employee SET ? WHERE id = ${employeeEl}`,
-              {
-                first_name: response.firstName,
-                last_name: response.lastName,
-                // id: employeeEl + 1,
-              },
-              function (err) {
-                if (err) throw err;
-                console.log("Employee successfully updated.")
-                init();
-              }
-            );
-          });
-      });
-    }
-
-  
+  });
+}
 
 function exit() {
   connection.end();
