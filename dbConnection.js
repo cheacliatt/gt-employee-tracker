@@ -58,12 +58,15 @@ function init() {
 
 function viewAllEmployees() {
   console.log("Selecting all employees...\n");
-  connection.query("SELECT * FROM employee", function (err, res) {
-    if (err) throw err;
-    console.log(res);
-    console.table(res);
-    init();
-  });
+  connection.query(
+    "SELECT employee.id, employee.first_name, employee.last_name, role.title FROM employee RIGHT JOIN role ON employee.id = role.id ORDER BY employee.id;",
+    function (err, res) {
+      if (err) throw err;
+      console.log(res);
+      console.table(res);
+      init();
+    }
+  );
 }
 
 function addEmployee() {
@@ -97,6 +100,54 @@ function addEmployee() {
       );
     });
 }
+
+
+
+
+// function addNewEmployee() {
+//   connection.query("SELECT * FROM role", (err, data) => {
+//     if (err) throw err;
+//     console.log(data);
+//     // let arrayOfNames = [];
+//     // for (let i = 0; i < data.length; i++) {
+//     //   arrayOfNames.push(data[i].name);
+//     // }
+//     const arrayOfRoles = data.map((object) => object.title);
+//     console.log(arrayOfRoles);
+//     inquirer
+//       .prompt([
+//         {
+//           name: "firstName",
+//           type: "input",
+//           message: "What is the employee's first name?",
+//         },
+//         {
+//           name: "lastName",
+//           type: "input",
+//           message: "What is the employee's last name?",
+//         },
+//         {
+//           type: "list",
+//           message: "Please select the employee's role:",
+//           choices: arrayOfNames,
+//           name: "employeeRole",
+//         },
+//       ])
+//       .then((response) => {
+//         console.log(response);
+//         const roleObject = data.filter(
+//           (object) => object.firstName && object.lastName === response.crewRank
+//         );
+//         console.log(roleObject);
+//       });
+//   });
+// }
+
+
+
+
+
+
 
 function assignRole() {
   inquirer
