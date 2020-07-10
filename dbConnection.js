@@ -43,13 +43,15 @@ function init() {
     ])
     .then(({ choice }) => {
       if (choice === "Add Employee") {
-        addEmployee();
+        addNewEmployee();
       } else if (choice === "Remove Employee") {
         removeEmployee();
       } else if (choice === "Update Employee") {
         updateEmployee();
       } else if (choice == "View All Employees") {
         viewAllEmployees();
+      } else if (choice == "View All Employees By Department") {
+        viewByDepartment();
       } else {
         exit();
       }
@@ -59,127 +61,79 @@ function init() {
 function viewAllEmployees() {
   console.log("Selecting all employees...\n");
   connection.query(
-    "SELECT employee.id, employee.first_name, employee.last_name, role.title FROM employee RIGHT JOIN role ON employee.id = role.id ORDER BY employee.id;",
+    "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id;",
     function (err, res) {
       if (err) throw err;
-      console.log(res);
       console.table(res);
       init();
     }
   );
 }
 
-function addEmployee() {
-  inquirer
-    .prompt([
-      {
-        name: "firstName",
-        type: "input",
-        message: "What is the employee's first name?",
-      },
-      {
-        name: "lastName",
-        type: "input",
-        message: "What is the employee's last name?",
-      },
-    ])
-    .then((answer) => {
-      // when finished prompting, insert a new item into the db with that info
-      connection.query(
-        "INSERT INTO employee SET ?",
-        {
-          first_name: answer.firstName,
-          last_name: answer.lastName,
-        },
-        (err) => {
-          if (err) throw err;
-          console.log("Your employee was added successfully!");
-          // re-prompt the user for if they want to bid or post
-          assignRole();
-        }
-      );
-    });
+function viewByDepartment() {
+  console.log("Selecting all employees...\n");
+  connection.query(
+    "SELECT department.name, role.title, employee.first_name, employee.last_name FROM department LEFT JOIN role ON role.department_id = department.id LEFT JOIN employee ON employee.role_id = role.id;",
+    function (err, res) {
+      if (err) throw err;
+      console.table(res);
+      init();
+    }
+  );
 }
 
 
 
 
-// function addNewEmployee() {
-//   connection.query("SELECT * FROM role", (err, data) => {
-//     if (err) throw err;
-//     console.log(data);
-//     // let arrayOfNames = [];
-//     // for (let i = 0; i < data.length; i++) {
-//     //   arrayOfNames.push(data[i].name);
-//     // }
-//     const arrayOfRoles = data.map((object) => object.title);
-//     console.log(arrayOfRoles);
-//     inquirer
-//       .prompt([
-//         {
-//           name: "firstName",
-//           type: "input",
-//           message: "What is the employee's first name?",
-//         },
-//         {
-//           name: "lastName",
-//           type: "input",
-//           message: "What is the employee's last name?",
-//         },
-//         {
-//           type: "list",
-//           message: "Please select the employee's role:",
-//           choices: arrayOfNames,
-//           name: "employeeRole",
-//         },
-//       ])
-//       .then((response) => {
-//         console.log(response);
-//         const roleObject = data.filter(
-//           (object) => object.firstName && object.lastName === response.crewRank
-//         );
-//         console.log(roleObject);
-//       });
-//   });
-// }
 
-
-
-
-
-
-
-function assignRole() {
-  inquirer
-    .prompt([
-      {
-        name: "position",
-        type: "input",
-        message: "What is their role?",
-      },
-      {
-        name: "salary",
-        type: "input",
-        message: "What is their salary?",
-      },
-    ])
-    .then((answer) => {
-      // when finished prompting, insert a new item into the db with that info
-      connection.query(
-        "INSERT INTO role SET ?",
+function addNewEmployee() {
+  connection.query("SELECT * FROM role", (err, data) => {
+    if (err) throw err;
+    const arrayOfRoles = data.map((object) => object.title);
+    inquirer
+      .prompt([
         {
-          title: answer.position,
-          salary: answer.salary,
+          name: "firstName",
+          type: "input",
+          message: "What is the employee's first name?",
         },
-        (err) => {
-          if (err) throw err;
-          console.log("Your role was added successfully!");
-          // re-prompt the user for if they want to bid or post
-          init();
+        {
+          name: "lastName",
+          type: "input",
+          message: "What is the employee's last name?",
+        },
+        {
+          type: "list",
+          message: "Please select the employee's role:",
+          choices: arrayOfRoles,
+          name: "employeeRole",
+        },
+      ])
+      .then((response) => {
+        console.log(response);
+        let choiceId = {};
+        for (let i = 0; i < data.length; i++) {
+          if (data[i].title === response.employeeRole) {
+            choiceId = data[i];
+          }
         }
-      );
-    });
+        const { firstName, lastName } = response;
+        connection.query(
+          "INSERT INTO employee SET ?",
+          {
+            first_name: firstName,
+            last_name: lastName,
+            role_id: choiceId.id,
+          },
+          function (err) {
+            if (err) throw err;
+            init();
+          }
+        )
+      });
+  });
 }
+
 
 function removeEmployee() {
   inquirer
