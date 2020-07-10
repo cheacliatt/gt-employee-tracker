@@ -20,17 +20,16 @@ This application serves employee tracer command line application. Users can view
 
 This code can be forked and cloned onto one's local device through GitHub. Please make sure you are using the correction applications for administering this code onto your device, such as Terminal and Visual Studio Code. The user must have working knowledge of how to opperate NODE JS.
 
-It should also be noted that user's MUST add all data from employeeSeeds.sql to MySQL Workbench in order for the application to properly work. Please also use the template employees, roles, and departments to ensure you have selections when executing the application. These can be edited freely to serve the user's needs.
+It should also be noted that user's MUST add all data from Seeds.sql, at the very least the Schema, to MySQL Workbench in order for the application to properly work. Please also use the template employees, roles, and departments to ensure you have selections when executing the application. These can be edited freely to serve the user's needs. If you wish to dynamically generate roles, please make sure to start with Add Department, then Add Role, then Add Employee.
 
 ## Usage
 
 The primary usage of this code is to create and view employees within a company.
 
 ## Links
-[GitHub repository](https://github.com/cheacliatt/gt-weather-dashboard "Repository")
+[GitHub repository](https://github.com/cheacliatt/gt-employee-tracker "Repository")
 
-
-[Heroku Server](https://gt-note-taker.herokuapp.com/ "Heroku")
+[Video Walkthrough](https://drive.google.com/file/d/166ca_0bjH4tHpEGkrb_EkgIUOZiyjl8T/view "Video")
 
 
 ## License
