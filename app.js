@@ -158,6 +158,7 @@ function addNewEmployee() {
       });
   });
 }
+
 // Add New Role is essentially the same as Add New Employee, but you're matching depart_id for role with the department id
 function addNewRole() {
   connection.query("SELECT * FROM department", (err, data) => {
